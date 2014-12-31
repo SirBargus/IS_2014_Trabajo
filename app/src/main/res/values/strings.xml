@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Notepad v3</string>
+    <string name="no_notes">No Notes Yet</string>
+    <string name="menu_insert">Add Note</string>
+    <string name="menu_delete">Delete Note</string>
+    <string name="title">Title</string>
+    <string name="body">Body</string>
+    <string name="confirm">Confirm</string>
+    <string name="edit_note">Edit Note</string>
+    <string name="id">ID</string>
+    <string name="java_mail_form">Send Mail</string>
+    <string name="from">From (User)</string>
+    <string name="to">To</string>
+    <string name="password">Password</string>
+    <string name="host">Host</string>
+    <string name="port">Port</string>
+    <string name="sport">Socket Port</string>
+    <string name="send">Send</string>
+    <string name="subject">Subject</string>
+    <string name="category">Category</string>
+    <string name="name">Name</string>
+    <string name="porNombre">Ordenar por nombre</string>
+    <string name="porCategoria">Ordenar por categoria</string>
+    <string name="listarNotas">Ver notas</string>
+    <string name="listarCategorias">Ver categorias</string>
+</resources>
