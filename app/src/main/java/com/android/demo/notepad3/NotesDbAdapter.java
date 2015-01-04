@@ -85,7 +85,9 @@ public class NotesDbAdapter {
             ContentValues initialValues = new ContentValues();
             initialValues.put(KEY_NAME, "default");
 
-            db.insert(DATABASE_CATEGORY, null, initialValues);
+            try{
+                db.insertOrThrow(DATABASE_CATEGORY,null,initialValues);
+            }catch(Exception e){}
         }
 
         @Override
@@ -138,6 +140,10 @@ public class NotesDbAdapter {
      */
     public long createNote(String title, String body, long category){
         long res;
+        if(title == null || title.length() == 0 || category <= 0 ||
+                !this.categoryExist(category)){
+            return -1;
+        }
         try{
             ContentValues initialValues = new ContentValues();
             initialValues.put(KEY_TITLE, title);
@@ -217,6 +223,10 @@ public class NotesDbAdapter {
      * @return true if the note was successfully updated, false otherwise
      */
     public boolean updateNote(long rowId, String title, String body, long category) {
+        if(title.length() == 0 || category <= 0 || !this.categoryExist(category)){
+            return false;
+        }
+
         ContentValues args = new ContentValues();
         args.put(KEY_TITLE, title);
         args.put(KEY_BODY, body);
@@ -230,5 +240,20 @@ public class NotesDbAdapter {
         ContentValues args = new ContentValues();
         args.put(KEY_CATEGORY   , neww);
         return mDb.update(DATABASE_TABLE, args, KEY_CATEGORY + "='" + old + "'", null) > 0;
+    }
+
+    private boolean categoryExist(long rowId){
+        try {
+            Cursor i = mDb.query(true, DATABASE_CATEGORY, new String[]{KEY_ROWID,
+                            KEY_NAME}, KEY_ROWID + "=" + rowId, null,
+                    null, null, null, null);
+            i.moveToFirst();
+            if(rowId == i.getLong(i.getColumnIndex(CategoriesDbAdapter.KEY_ROWID)))
+                return true;
+            else
+                return false;
+        }catch(Exception e){
+            return false;
+        }
     }
 }

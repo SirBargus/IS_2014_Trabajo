@@ -58,7 +58,7 @@ public class Test {
             android.util.Log.d("Test - crear nota - FAIL 2: ", "" + mdB.createNote(null, "Test",
                     CategoriesDbAdapter.getDefault_category()));
         }catch(Exception e){
-            android.util.Log.d("Test - crear nota - FAIL 2: ", e.getMessage());
+            android.util.Log.d("Test - crear nota - FAIL 2: ", "-1");
         }
         android.util.Log.d("Test - crear nota - FAIL 3: ", "" + mdB.createNote("", "Test",
                 CategoriesDbAdapter.getDefault_category()));
@@ -66,11 +66,14 @@ public class Test {
             android.util.Log.d("Test - crear nota - FAIL 4: ", "" + mdB.createNote("Test", null,
                     CategoriesDbAdapter.getDefault_category()));
         }catch(Exception e){
-            android.util.Log.d("Test - crear nota - FAIL 4: ", e.getMessage());
+            android.util.Log.d("Test - crear nota - FAIL 4: ", "-1");
         }
-        android.util.Log.d("Test - crear nota - FAIL 5: ", "" + mdB.createNote("Test", "Test", 0));
+        android.util.Log.d("Test - crear nota - FAIL 5: ", "" + mdB.createNote("Test", "Test", -1));
         android.util.Log.d("Test - crear nota - FAIL 6: ", "" + mdB.createNote("Test", "Test",
                 1000000000));
+
+        //borramos la nota creada
+        mdB.deleteNote(id);
     }
 
     /**
@@ -78,7 +81,7 @@ public class Test {
      */
     private static void borrar_nota(NotesDbAdapter mdB) throws SQLiteConstraintException{
         //Creamos una nota para asegurarnos de que existe
-        long id = mdB.createNote("Test", "Test", CategoriesDbAdapter.getDefault_category());
+        long id = mdB.createNote("Test_a", "Test_a", CategoriesDbAdapter.getDefault_category());
 
         //clases de equivalencia validas
         android.util.Log.d("Test - borrar nota - OK: ", "" + mdB.deleteNote(id));
@@ -106,7 +109,7 @@ public class Test {
             android.util.Log.d("Test - modificar nota - FAIL 4: ", "" + mdB.updateNote(1, null, "Test",
                     CategoriesDbAdapter.getDefault_category()));
         }catch(Exception e){
-            android.util.Log.d("Test - modificar nota - FAIL 4: ", e.getMessage());
+            android.util.Log.d("Test - modificar nota - FAIL 4: ", "false");
         }
         android.util.Log.d("Test - modificar nota - FAIL 5: ", "" + mdB.updateNote(1, "", "Test",
                 CategoriesDbAdapter.getDefault_category()));
@@ -114,7 +117,7 @@ public class Test {
             android.util.Log.d("Test - modificar nota - FAIL 6: ", "" + mdB.updateNote(1, "Test", null,
                     CategoriesDbAdapter.getDefault_category()));
         }catch(Exception e){
-            android.util.Log.d("Test - modificar nota - FAIL 6: ", e.getMessage());
+            android.util.Log.d("Test - modificar nota - FAIL 6: ", "false");
         }
         android.util.Log.d("Test - modificar nota - FAIL 7: ", "" + mdB.updateNote(1, "Test", "Test",
                 0));
@@ -138,7 +141,7 @@ public class Test {
         try {
             android.util.Log.d("Test - Crear categoria - FAIL 2: ", "" + mdB.createCategory(null));
         }catch(Exception e){
-            android.util.Log.d("Test - Crear categoria - FAIL 2: ", e.getMessage());
+            android.util.Log.d("Test - Crear categoria - FAIL 2: ", "-1");
         }
         android.util.Log.d("Test - Crear categoria - FAIL 3: ", "" + mdB.createCategory(""));
 
@@ -159,12 +162,12 @@ public class Test {
         try {
             android.util.Log.d("Test - Borrar categoria - FAIL 2: ", "" + mdB.deleteCategory(0));
         }catch(Exception e){
-            android.util.Log.d("Test - Borrar categoria - FAIL 2: ", e.getMessage());
+            android.util.Log.d("Test - Borrar categoria - FAIL 2: ", "false");
         }
         try {
             android.util.Log.d("Test - Borrar categoria - FAIL 3: ", "" + mdB.deleteCategory(id));
         }catch(Exception e){
-            android.util.Log.d("Test - Borrar categoria - FAIL 3: ", e.getMessage());
+            android.util.Log.d("Test - Borrar categoria - FAIL 3: ", "false");
         }
     }
 
@@ -183,17 +186,17 @@ public class Test {
             android.util.Log.d("Test - Modificar categoria - FAIL 2: ", "" + mdB.updateCategory(0,
                     "Test2"));
         }catch(Exception e){
-            android.util.Log.d("Test - Modificar categoria - FAIL 2: ", e.getMessage());
+            android.util.Log.d("Test - Modificar categoria - FAIL 2: ", "false");
         }
         try {
             android.util.Log.d("Test - Modificar categoria - FAIL 4: ", "" + mdB.updateCategory(id, null));
         }catch(Exception e){
-            android.util.Log.d("Test - Modificar categoria - FAIL 4: ", e.getMessage());
+            android.util.Log.d("Test - Modificar categoria - FAIL 4: ", "false");
         }
         try {
             android.util.Log.d("Test - Modificar categoria - FAIL 5: ", "" + mdB.updateCategory(id, ""));
         }catch(Exception e){
-            android.util.Log.d("Test - Modificar categoria - FAIL 5: ", e.getMessage());
+            android.util.Log.d("Test - Modificar categoria - FAIL 5: ", "false");
         }
         //borramos la categoria creada
         mdB.deleteCategory(id);
@@ -201,7 +204,7 @@ public class Test {
             android.util.Log.d("Test - Modificar categoria - FAIL 3: ", "" + mdB.updateCategory(id,
                     "Test2"));
         }catch(Exception e){
-            android.util.Log.d("Test - Modificar categoria - FAIL 3: ", e.getMessage());
+            android.util.Log.d("Test - Modificar categoria - FAIL 3: ", "false");
         }
     }
 }

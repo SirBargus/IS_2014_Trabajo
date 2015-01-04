@@ -112,7 +112,9 @@ public class CategoryList extends ListActivity {
         switch(item.getItemId()) {
             case DELETE_CATEGORY:
                 AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-                mDbHelper.deleteCategory(info.id);
+                if(info.id != CategoriesDbAdapter.getDefault_category()) {
+                    mDbHelper.deleteCategory(info.id);
+                }
                 fillData();
                 return true;
             case SHOW_NOTES_THIS:

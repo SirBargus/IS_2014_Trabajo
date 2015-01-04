@@ -97,7 +97,6 @@ public class NoteEdit extends Activity {
                     CategoriesDbAdapter.KEY_NAME));
             mIdText.setHint(mRowId.toString());
         }else{
-            categoryNote = "";
             mIdText.setHint("***");
         }
     }
@@ -149,8 +148,6 @@ public class NoteEdit extends Activity {
         Cursor c = mDb.fetchAllCategories();
 
         list.add(categoryNote);
-
-
         while(c.moveToNext()) {
             String name = c.getString(c.getColumnIndex(CategoriesDbAdapter.KEY_NAME));
             Long id = c.getLong(c.getColumnIndex(CategoriesDbAdapter.KEY_ROWID));

@@ -59,7 +59,7 @@ public class CategoriesDbAdapter {
     private final Context mCtx;
     private NotesDbAdapter notesDB;
 
-    private static long default_category;
+    private static long default_category = 1;
 
     private static class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -131,6 +131,9 @@ public class CategoriesDbAdapter {
      * @return rowId or -1 if failed
      */
     public long createCategory(String name){
+        if(name.length() == 0){
+            return -1;
+        }
         ContentValues initialValues = new ContentValues();
         initialValues.put(KEY_NAME, name);
 
@@ -164,6 +167,9 @@ public class CategoriesDbAdapter {
      * @return true if the note was successfully updated, false otherwise
      */
     public boolean updateCategory(long rowId, String name) {
+        if(name.length() == 0){
+            return false;
+        }
         Cursor c = this.fetchCategory(rowId);
         String old = c.getString(c.getColumnIndex(KEY_NAME));
         ContentValues args = new ContentValues();
