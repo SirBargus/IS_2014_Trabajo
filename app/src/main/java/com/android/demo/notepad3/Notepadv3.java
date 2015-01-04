@@ -52,8 +52,9 @@ public class Notepadv3 extends ListActivity {
     private static final int SORT_CATEGORY = Menu.FIRST + 4;
     private static final int SHOW_CATEGORY = Menu.FIRST + 5;
     private static final int SHOW_ALL_NOTES = Menu.FIRST + 6;
+    private static final int TEST = Menu.FIRST + 7;
 
-    static String categoryShow = null;
+    static long categoryShow = -1;
 
     private NotesDbAdapter mDbHelper;
 
@@ -93,6 +94,7 @@ public class Notepadv3 extends ListActivity {
         menu.add(3, SORT_CATEGORY, 3, "Sort by category");
         menu.add(4, SHOW_CATEGORY, 4, "Show category");
         menu.add(5, SHOW_ALL_NOTES, 5, "Show all notes");
+        menu.add(6, TEST, 6, "Test");
         return true;
     }
 
@@ -114,8 +116,13 @@ public class Notepadv3 extends ListActivity {
                 showCategory();
                 return true;
             case SHOW_ALL_NOTES:
-                categoryShow = null;
+                categoryShow = -1;
                 fillData();
+                return true;
+            case TEST:
+                CategoriesDbAdapter dummy_mDb = new CategoriesDbAdapter(this, mDbHelper);
+                dummy_mDb.open();
+                Test.go_test(mDbHelper, dummy_mDb);
                 return true;
         }
 

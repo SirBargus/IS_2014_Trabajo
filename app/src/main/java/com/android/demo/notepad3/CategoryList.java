@@ -118,10 +118,11 @@ public class CategoryList extends ListActivity {
             case SHOW_NOTES_THIS:
                 AdapterContextMenuInfo info2 = (AdapterContextMenuInfo) item.getMenuInfo();
                 Cursor c = mDbHelper.fetchCategory(info2.id);
-                String aux = c.getString(c.getColumnIndex("name"));
+                long aux = c.getLong(c.getColumnIndex(CategoriesDbAdapter.KEY_ROWID));
                 Notepadv3.categoryShow = aux;
                 Intent i = new Intent(this, Notepadv3.class);
                 startActivityForResult(i, ACTIVITY_NOTES);
+                finish();
                 return true;
         }
         return super.onContextItemSelected(item);
@@ -134,8 +135,9 @@ public class CategoryList extends ListActivity {
 
     private void showNotes(){
         Intent i = new Intent(this, Notepadv3.class);
-        Notepadv3.categoryShow = null;
+        Notepadv3.categoryShow = -1;
         startActivityForResult(i, ACTIVITY_NOTES);
+        finish();
     }
 
     @Override

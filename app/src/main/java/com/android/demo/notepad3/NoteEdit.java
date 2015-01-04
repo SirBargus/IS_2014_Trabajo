@@ -18,6 +18,7 @@ package com.android.demo.notepad3;
 
 import android.app.Activity;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -25,7 +26,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class NoteEdit extends Activity {
@@ -37,6 +40,7 @@ public class NoteEdit extends Activity {
     private Long mRowId;
     private NotesDbAdapter mDbHelper;
     private CategoriesDbAdapter mDb;
+    private HashMap<String, Long> category_name_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +50,7 @@ public class NoteEdit extends Activity {
         mDb = new CategoriesDbAdapter(this, mDbHelper);
         mDb.open();
         categoryNote = "default";
+        category_name_id = new HashMap<>();
 
         setContentView(R.layout.note_edit);
         setTitle(R.string.edit_note);
@@ -79,6 +84,7 @@ public class NoteEdit extends Activity {
     }
 
     private void populateFields() {
+        long id;
         if (mRowId != null) {
             Cursor note = mDbHelper.fetchNote(mRowId);
             startManagingCursor(note);
@@ -86,8 +92,9 @@ public class NoteEdit extends Activity {
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE)));
             mBodyText.setText(note.getString(
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
-            categoryNote = note.getString(
-                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_CATEGORY));
+            id = note.getLong(note.getColumnIndexOrThrow((NotesDbAdapter.KEY_CATEGORY)));
+            categoryNote = mDb.fetchCategory(id).getColumnName(mDb.fetchCategory(id).getColumnIndex(
+                    CategoriesDbAdapter.KEY_NAME));
             mIdText.setHint(mRowId.toString());
         }else{
             categoryNote = "";
@@ -119,14 +126,17 @@ public class NoteEdit extends Activity {
         String title = mTitleText.getText().toString();
         String body = mBodyText.getText().toString();
         String category = spinner.getSelectedItem().toString();
+        long idCategory = category_name_id.get(category);
+        long id;
 
         if (mRowId == null) {
-            long id = mDbHelper.createNote(title, body, category);
-            if (id > 0) {
-                mRowId = id;
-            }
+            try {
+                id = mDbHelper.createNote(title, body, idCategory);if (id > 0) {
+                    mRowId = id;
+                }
+            }catch(SQLiteConstraintException e){}
         } else {
-            mDbHelper.updateNote(mRowId, title, body, category);
+            mDbHelper.updateNote(mRowId, title, body, idCategory);
         }
     }
 
@@ -142,7 +152,9 @@ public class NoteEdit extends Activity {
 
 
         while(c.moveToNext()) {
-            String name = c.getString(c.getColumnIndex("name"));
+            String name = c.getString(c.getColumnIndex(CategoriesDbAdapter.KEY_NAME));
+            Long id = c.getLong(c.getColumnIndex(CategoriesDbAdapter.KEY_ROWID));
+            category_name_id.put(name, id);
             if(!name.equals(categoryNote))
             {
                 list.add(name);

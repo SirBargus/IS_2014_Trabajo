@@ -20,6 +20,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -51,11 +52,11 @@ public class NotesDbAdapter {
      */
    private static final String DATABASE_CREATE_CATEGORY =
         "CREATE TABLE category(_id INTEGER PRIMARY KEY AUTOINCREMENT,"
-        + "name TEXT NOT NULL UNIQUE);";
+        + "name TEXT NOT NULL);";
     private static final String DATABASE_CREATE_NOTES =
         "CREATE TABLE notes (_id INTEGER PRIMARY KEY AUTOINCREMENT, "
-        + "title TEXT NOT NULL, body TEXT NOT NULL, category TEXT,"
-        + "FOREIGN KEY(category) REFERENCES category(name));";
+        + "title TEXT NOT NULL, body TEXT NOT NULL, category INTEGER NOT NULL,"
+        + "FOREIGN KEY(category) REFERENCES category(_id));";
 
     private static final String DATABASE_NAME = "data";
     private static final String DATABASE_TABLE = "notes";
@@ -135,13 +136,16 @@ public class NotesDbAdapter {
      * @param body the body of the note
      * @return rowId or -1 if failed
      */
-    public long createNote(String title, String body, String category) {
-        ContentValues initialValues = new ContentValues();
-        initialValues.put(KEY_TITLE, title);
-        initialValues.put(KEY_BODY, body);
-        initialValues.put(KEY_CATEGORY, category);
-
-        return mDb.insert(DATABASE_TABLE, null, initialValues);
+    public long createNote(String title, String body, long category){
+        long res;
+        try{
+            ContentValues initialValues = new ContentValues();
+            initialValues.put(KEY_TITLE, title);
+            initialValues.put(KEY_BODY, body);
+            initialValues.put(KEY_CATEGORY, category);
+            res = mDb.insertOrThrow(DATABASE_TABLE, null, initialValues);
+        }catch(SQLiteConstraintException e){res = -1;}
+        return res;
     }
 
     /**
@@ -161,8 +165,8 @@ public class NotesDbAdapter {
      * @param n : 0 -> sort by title, 1 -> sort by category
      * @return Cursor over all notes
      */
-    public Cursor fetchAllNotes(int n, String category) {
-        if(category == null) {
+    public Cursor fetchAllNotes(int n, long category) {
+        if(category == -1) {
             switch (n) {
                 case 0:
                     return mDb.query(DATABASE_TABLE, new String[]{KEY_ROWID, KEY_TITLE,
@@ -212,7 +216,7 @@ public class NotesDbAdapter {
      * @param body value to set note body to
      * @return true if the note was successfully updated, false otherwise
      */
-    public boolean updateNote(long rowId, String title, String body, String category) {
+    public boolean updateNote(long rowId, String title, String body, long category) {
         ContentValues args = new ContentValues();
         args.put(KEY_TITLE, title);
         args.put(KEY_BODY, body);

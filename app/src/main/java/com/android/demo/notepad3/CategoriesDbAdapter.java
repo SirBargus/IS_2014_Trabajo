@@ -20,6 +20,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -55,9 +56,10 @@ public class CategoriesDbAdapter {
 
     private static final String DATABASE_CATEGORY = "category";
 
-
     private final Context mCtx;
     private NotesDbAdapter notesDB;
+
+    private static long default_category;
 
     private static class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -76,7 +78,7 @@ public class CategoriesDbAdapter {
             ContentValues initialValues = new ContentValues();
             initialValues.put(KEY_NAME, "default");
 
-            db.insert(DATABASE_CATEGORY, null, initialValues);
+            default_category = db.insert(DATABASE_CATEGORY, null, initialValues);
         }
 
         @Override
@@ -128,11 +130,13 @@ public class CategoriesDbAdapter {
      * @param name the name of the category
      * @return rowId or -1 if failed
      */
-    public long createCategory(String name) {
+    public long createCategory(String name){
         ContentValues initialValues = new ContentValues();
         initialValues.put(KEY_NAME, name);
 
-        return mDb.insert(DATABASE_CATEGORY, null, initialValues);
+        try{
+            return mDb.insertOrThrow(DATABASE_CATEGORY,null,initialValues);
+        }catch(Exception e){return -1;}
     }
 
     /**
@@ -159,7 +163,9 @@ public class CategoriesDbAdapter {
      * @param name value to set note title to
      * @return true if the note was successfully updated, false otherwise
      */
-    public boolean updateCategory(long rowId, String name, String old) {
+    public boolean updateCategory(long rowId, String name) {
+        Cursor c = this.fetchCategory(rowId);
+        String old = c.getString(c.getColumnIndex(KEY_NAME));
         ContentValues args = new ContentValues();
         args.put(KEY_NAME, name);
         //Actualizar valor en las notas
@@ -197,6 +203,12 @@ public class CategoriesDbAdapter {
             mCursor.moveToFirst();
         }
         return mCursor;
+    }
 
+    /**
+     * @return : id of the default category
+     */
+    public static long getDefault_category(){
+        return default_category;
     }
 }

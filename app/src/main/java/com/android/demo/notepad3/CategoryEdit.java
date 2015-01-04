@@ -109,7 +109,7 @@ public class CategoryEdit extends Activity {
                 mRowId = id;
             }
         } else {
-            mDb.updateCategory(mRowId, name, oldName);
+            mDb.updateCategory(mRowId, name);
         }
     }
 
