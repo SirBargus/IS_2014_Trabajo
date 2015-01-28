@@ -26,7 +26,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +41,10 @@ public class NoteEdit extends Activity {
     private CategoriesDbAdapter mDb;
     private HashMap<String, Long> category_name_id;
 
+    /**
+     * Crea la actividad
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +63,7 @@ public class NoteEdit extends Activity {
         mIdText = (EditText) findViewById(R.id.noID);
 
         Button confirmButton = (Button) findViewById(R.id.confirm);
+        Button delete = (Button) findViewById(R.id.delete_category);
 
         mRowId = (savedInstanceState == null) ? null :
             (Long) savedInstanceState.getSerializable(NotesDbAdapter.KEY_ROWID);
@@ -81,10 +85,21 @@ public class NoteEdit extends Activity {
             }
 
         });
+        delete.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                categoryNote = "default";
+                fillSpinner();
+            }
+        });
     }
 
+    /**
+     * Rellena los campos
+     */
     private void populateFields() {
         long id;
+        Cursor c;
+
         if (mRowId != null) {
             Cursor note = mDbHelper.fetchNote(mRowId);
             startManagingCursor(note);
@@ -93,8 +108,8 @@ public class NoteEdit extends Activity {
             mBodyText.setText(note.getString(
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
             id = note.getLong(note.getColumnIndexOrThrow((NotesDbAdapter.KEY_CATEGORY)));
-            categoryNote = mDb.fetchCategory(id).getColumnName(mDb.fetchCategory(id).getColumnIndex(
-                    CategoriesDbAdapter.KEY_NAME));
+            c = mDb.fetchCategory(id);
+            categoryNote = c.getString(c.getColumnIndex(NotesDbAdapter.KEY_NAME));
             mIdText.setHint(mRowId.toString());
         }else{
             mIdText.setHint("***");
@@ -159,7 +174,8 @@ public class NoteEdit extends Activity {
         }
 
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, list);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, list);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         spinner.setAdapter(adapter);

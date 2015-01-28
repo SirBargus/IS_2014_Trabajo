@@ -31,6 +31,10 @@ public class CategoryEdit extends Activity {
     private Long mRowId;
     private CategoriesDbAdapter mDb;
 
+    /**
+     * Crea la actividad
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +71,9 @@ public class CategoryEdit extends Activity {
         });
     }
 
+    /**
+     * Rellena los campos
+     */
     private void populateFields() {
         if (mRowId != null) {
             Cursor note = mDb.fetchCategory(mRowId);
@@ -100,6 +107,9 @@ public class CategoryEdit extends Activity {
         populateFields();
     }
 
+    /**
+     * Guarda la categoria
+     */
     private void saveState() {
         String name = mName.getText().toString();
 

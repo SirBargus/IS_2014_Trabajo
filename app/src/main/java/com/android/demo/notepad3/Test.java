@@ -3,18 +3,24 @@ package com.android.demo.notepad3;
 import android.database.sqlite.SQLiteConstraintException;
 
 import java.sql.SQLException;
+import java.util.Vector;
 
 /**
  * Created by agustin on 3/1/15.
  */
 public class Test {
 
+    /**
+     * Ejecuta las pruebas de test d ela palicación notas
+     * @param mdB
+     * @param mdB2
+     * @return
+     */
     public static void go_test(NotesDbAdapter mdB, CategoriesDbAdapter mdB2){
         pruebas_unitarias(mdB, mdB2);
-        pruebas_volumen();
-        pruebas_sobrecarga();
+        pruebas_volumen(mdB, mdB2);
+        pruebas_sobrecarga(mdB, mdB2);
     }
-
     //Private methods
 
     /**
@@ -34,15 +40,82 @@ public class Test {
     /**
      * Realiza las pruebas de volumen
      */
-    private static void pruebas_volumen(){
+    private static void pruebas_volumen(NotesDbAdapter mdB, CategoriesDbAdapter mdB2){
+        int MAX = 1000;
+        //Crea 1000 notas
+        for(int i = 0; i < MAX; i++) {
+            //Mejora la visibilidad de las notas en el menu
+            if (i < 10) {
+                mdB.createNote("Test Volumen Notas 00" + i, "TestVolumen",
+                        CategoriesDbAdapter.getDefault_category());
+            } else if (i < 100){
+                mdB.createNote("Test Volumen Notas 0" + i, "TestVolumen",
+                        CategoriesDbAdapter.getDefault_category());
+            } else{
+                mdB.createNote("Test Volumen Notas " + i, "TestVolumen",
+                        CategoriesDbAdapter.getDefault_category());
+            }
+        }
 
+        //Crea 1000 categorias
+        for(int i = 0; i < MAX; i++) {
+            //Mejora la visibilidad de las notas en el menu
+            if (i < 10) {
+                mdB2.createCategory("Test Volumen Categorias 00" + i);
+            } else if (i < 100){
+                mdB2.createCategory("Test Volumen Categorias 0" + i);
+            } else{
+                mdB2.createCategory("Test Volumen Categorias " + i);
+            }
+        }
     }
 
     /**
-     * Realiza las pruebas de sobrecarga
+     * Realiza las pruebas de sobrecarga de la aplicación notas
+     * @param mdB : bbdd de las notas
+     * @param mdB2 : bbddde las categorias
      */
-    private static void pruebas_sobrecarga(){
+    private static void pruebas_sobrecarga(NotesDbAdapter mdB, CategoriesDbAdapter mdB2){
+        int PLUS = 1;
 
+        int maxTitle = 1;
+        int maxBody = 1;
+        int maxCategory = 1;
+        long end = 0;
+
+        String aux = "*";
+        for (int i = 0; i<PLUS; i++){
+            aux = aux + "*";
+        }
+
+        String text = "A";
+        while(end != -1){
+            end = mdB.createNote(text, "A", CategoriesDbAdapter.getDefault_category());
+            mdB.deleteNote(end);
+            text = text + aux;
+            maxTitle += PLUS;
+            android.util.Log.d("Test-Sobrecarga-Notas-Titulo", "" + maxTitle);
+        }
+
+        end = 0;
+        text = "A";
+        while(end != -1){
+            end = mdB.createNote("A", text, CategoriesDbAdapter.getDefault_category());
+            mdB.deleteNote(end);
+            text = text + aux;
+            maxTitle += PLUS;
+            android.util.Log.d("Test-Sobrecarga-Notas-Cuerpo", "" + maxBody);
+        }
+
+        end = 0;
+        text = "A";
+        while(end != -1){
+            end = mdB2.createCategory(text);
+            mdB2.deleteCategory(end);
+            text = text + aux;
+            maxCategory += PLUS;
+            android.util.Log.d("Test-Sobrecarga-Categoria", "" + maxCategory);
+        }
     }
 
     /**

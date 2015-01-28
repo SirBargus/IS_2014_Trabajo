@@ -54,6 +54,8 @@ public class Notepadv3 extends ListActivity {
     private static final int SHOW_ALL_NOTES = Menu.FIRST + 6;
     private static final int TEST = Menu.FIRST + 7;
 
+    private static int posUltimaNota = 0;
+
     static long categoryShow = -1;
 
     private NotesDbAdapter mDbHelper;
@@ -72,6 +74,9 @@ public class Notepadv3 extends ListActivity {
         registerForContextMenu(getListView());
     }
 
+    /**
+     * Muestra las notas por pantalla
+     */
     private void fillData() {
         Cursor notesCursor = mDbHelper.fetchAllNotes(show, categoryShow);
         startManagingCursor(notesCursor);
@@ -84,8 +89,14 @@ public class Notepadv3 extends ListActivity {
         SimpleCursorAdapter notes = 
             new SimpleCursorAdapter(this, R.layout.notes_row, notesCursor, from, to);
         setListAdapter(notes);
+        this.setSelection(posUltimaNota);
     }
 
+    /**
+     * Crea las opciones del menu
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -98,22 +109,32 @@ public class Notepadv3 extends ListActivity {
         return true;
     }
 
+    /**
+     * Opciones al seleccionar un item
+     * @param featureId
+     * @param item
+     * @return
+     */
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         switch(item.getItemId()) {
             case INSERT_ID:
                 createNote();
+                posUltimaNota = this.getListView().getCount();
                 return true;
             case SORT_TITLE:
                 show = 0;
                 fillData();
+                posUltimaNota = 0;
                 return true;
             case SORT_CATEGORY:
                 show = 1;
                 fillData();
+                posUltimaNota = 0;
                 return true;
             case SHOW_CATEGORY:
                 showCategory();
+                CategoryList.setPosUltCategory(0);
                 return true;
             case SHOW_ALL_NOTES:
                 categoryShow = -1;
@@ -123,12 +144,19 @@ public class Notepadv3 extends ListActivity {
                 CategoriesDbAdapter dummy_mDb = new CategoriesDbAdapter(this, mDbHelper);
                 dummy_mDb.open();
                 Test.go_test(mDbHelper, dummy_mDb);
+                fillData();
                 return true;
         }
 
         return super.onMenuItemSelected(featureId, item);
     }
 
+    /**
+     * Crea el menu contextual
+     * @param menu
+     * @param v
+     * @param menuInfo
+     */
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
             ContextMenuInfo menuInfo) {
@@ -137,6 +165,11 @@ public class Notepadv3 extends ListActivity {
         menu.add(0, SEND_EMAIL, 0, "Send email");
     }
 
+    /**
+     * Operaicones al seleccionar un item del menu contextual
+     * @param item
+     * @return
+     */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         switch(item.getItemId()) {
@@ -157,19 +190,33 @@ public class Notepadv3 extends ListActivity {
         return super.onContextItemSelected(item);
     }
 
+    /**
+     * Crea un nota
+     */
     private void createNote() {
         Intent i = new Intent(this, NoteEdit.class);
         startActivityForResult(i, ACTIVITY_CREATE);
     }
 
+    /**
+     * Muestra la categoria de una nota
+     */
     private void showCategory(){
         Intent i = new Intent(this, CategoryList.class);
         startActivityForResult(i, ACTIVITY_CATEGORY);
     }
 
+    /**
+     * Edita la nota
+     * @param l
+     * @param v
+     * @param position
+     * @param id
+     */
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
+        posUltimaNota = position;
         Intent i = new Intent(this, NoteEdit.class);
         i.putExtra(NotesDbAdapter.KEY_ROWID, id);
         startActivityForResult(i, ACTIVITY_EDIT);
@@ -179,5 +226,13 @@ public class Notepadv3 extends ListActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         fillData();
+    }
+
+    /**
+     * Cambia el valor de posUltimaNota
+     * @param nPosUltimaNota : nuevo valor de posUltimaNota
+     */
+    public static void setPosUltimaNota(int nPosUltimaNota){
+        posUltimaNota = nPosUltimaNota;
     }
 }

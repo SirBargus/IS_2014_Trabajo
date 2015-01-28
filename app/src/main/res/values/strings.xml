@@ -23,5 +23,6 @@
     <string name="porNombre">Ordenar por nombre</string>
     <string name="porCategoria">Ordenar por categoria</string>
     <string name="listarNotas">Ver notas</string>
+    <string name="delete">Delete category</string>
     <string name="listarCategorias">Ver categorias</string>
 </resources>

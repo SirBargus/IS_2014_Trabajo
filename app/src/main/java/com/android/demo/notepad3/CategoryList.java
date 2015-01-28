@@ -46,6 +46,8 @@ public class CategoryList extends ListActivity {
     private static final int SHOW_NOTES = Menu.FIRST + 2;
     private static final int SHOW_NOTES_THIS = Menu.FIRST + 3;
 
+    private static int posUltCategory = 0;
+
     private CategoriesDbAdapter mDbHelper;
     private NotesDbAdapter mDbNotes;
 
@@ -55,6 +57,8 @@ public class CategoryList extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.category_list);
+        setTitle(R.string.category);
+
         mDbNotes = new NotesDbAdapter(this);
         mDbNotes.open();
         mDbHelper = new CategoriesDbAdapter(this, mDbNotes);
@@ -63,6 +67,9 @@ public class CategoryList extends ListActivity {
         registerForContextMenu(getListView());
     }
 
+    /**
+     * Muestra por pantalla las categorias
+     */
     private void fillData() {
         Cursor categoriesCursor = mDbHelper.fetchAllCategories();
         startManagingCursor(categoriesCursor);
@@ -75,8 +82,14 @@ public class CategoryList extends ListActivity {
         SimpleCursorAdapter categories =
             new SimpleCursorAdapter(this, R.layout.notes_row, categoriesCursor, from, to);
         setListAdapter(categories);
+        this.setSelection(posUltCategory);
     }
 
+    /**
+     * Opciones del menu creado
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -85,6 +98,12 @@ public class CategoryList extends ListActivity {
         return true;
     }
 
+    /**
+     * Opciones al seleccionar un item del menu
+     * @param featureId
+     * @param item
+     * @return
+     */
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         switch(item.getItemId()) {
@@ -99,6 +118,12 @@ public class CategoryList extends ListActivity {
         return super.onMenuItemSelected(featureId, item);
     }
 
+    /**
+     * Crea las opciones del menu contextual
+     * @param menu
+     * @param v
+     * @param menuInfo
+     */
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
             ContextMenuInfo menuInfo) {
@@ -107,6 +132,11 @@ public class CategoryList extends ListActivity {
         menu.add(0, SHOW_NOTES_THIS, 0, "Show notes");
     }
 
+    /**
+     * Operaciones del menu seleccionado
+     * @param item
+     * @return
+     */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         switch(item.getItemId()) {
@@ -130,18 +160,33 @@ public class CategoryList extends ListActivity {
         return super.onContextItemSelected(item);
     }
 
+    /**
+     * Crea una categoria
+     */
     private void createCategory() {
         Intent i = new Intent(this, CategoryEdit.class);
         startActivityForResult(i, CATEGORY_CREATE);
+        posUltCategory = this.getListView().getCount();
     }
 
+    /**
+     * Muestra las notas
+     */
     private void showNotes(){
         Intent i = new Intent(this, Notepadv3.class);
         Notepadv3.categoryShow = -1;
         startActivityForResult(i, ACTIVITY_NOTES);
+        Notepadv3.setPosUltimaNota(0);
         finish();
     }
 
+    /**
+     * Edita una nota
+     * @param l
+     * @param v
+     * @param position
+     * @param id
+     */
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
@@ -154,5 +199,13 @@ public class CategoryList extends ListActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         fillData();
+    }
+
+    /**
+     * Actualiza el valor de posUltCategory
+     * @param nPosUltCategory = posUltCategory
+     */
+    public static void setPosUltCategory(int nPosUltCategory){
+        posUltCategory = nPosUltCategory;
     }
 }

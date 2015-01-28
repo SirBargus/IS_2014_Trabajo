@@ -150,6 +150,9 @@ public class CategoriesDbAdapter {
      */
     public boolean deleteCategory(long rowId) {
         //Actualizar balores de las notas
+        if(rowId == CategoriesDbAdapter.default_category){
+            return false;
+        }
         Cursor c = fetchCategory(rowId);
         String name = c.getString(c.getColumnIndex("name"));
         notesDB.updateCategories(name, "default");
